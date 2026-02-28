@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import IOSUnscrolledInput from "@/components/input";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,6 @@ import {
 import { useCurrency } from "@/hooks/use-currency";
 import { useIntl } from "@/locale";
 import { type Asset, type AssetType, useAssetStore } from "@/store/asset";
-
-const assetTypes: { label: string; value: AssetType; icon: string }[] = [
-    { label: "Cash", value: "cash", icon: "mdi--cash" },
-    { label: "Debit Card", value: "debit", icon: "mdi--credit-card-outline" },
-    { label: "Credit Card", value: "credit", icon: "mdi--credit-card" },
-    { label: "Virtual Account", value: "virtual", icon: "mdi--wallet-outline" },
-    { label: "Investment", value: "investment", icon: "mdi--finance" },
-    { label: "Debt", value: "debt", icon: "mdi--hand-coin-outline" },
-];
 
 interface AssetEditProps {
     asset?: Asset;
@@ -40,15 +31,24 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
     );
     const [note, setNote] = useState(asset?.note || "");
 
+    const assetTypes = useMemo<{ label: string; value: AssetType; icon: string }[]>(() => [
+        { label: t("cash"), value: "cash", icon: "mdi--cash" },
+        { label: t("debit"), value: "debit", icon: "mdi--credit-card-outline" },
+        { label: t("credit"), value: "credit", icon: "mdi--credit-card" },
+        { label: t("virtual"), value: "virtual", icon: "mdi--wallet-outline" },
+        { label: t("investment"), value: "investment", icon: "mdi--finance" },
+        { label: t("debt"), value: "debt", icon: "mdi--hand-coin-outline" },
+    ], [t]);
+
     const handleSubmit = () => {
         if (!name) {
-            toast.error("Name is required");
+            toast.error(t("name-required"));
             return;
         }
 
         const numBalance = parseFloat(balance);
         if (isNaN(numBalance)) {
-            toast.error("Invalid balance");
+            toast.error(t("invalid-balance"));
             return;
         }
 
@@ -60,7 +60,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                 currency,
                 note,
             });
-            toast.success("Asset updated");
+            toast.success(t("asset-updated"));
         } else {
             addAsset({
                 id: crypto.randomUUID(),
@@ -70,7 +70,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                 currency,
                 note,
             });
-            toast.success("Asset added");
+            toast.success(t("asset-added"));
         }
         onClose();
     };

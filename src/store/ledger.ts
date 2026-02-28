@@ -12,7 +12,6 @@ import { amountToNumber } from "@/ledger/bill";
 import type { Bill, GlobalMeta, PersonalMeta } from "@/ledger/type";
 import { t } from "@/locale";
 
-import { useAssetStore } from "./asset";
 import { useBookStore } from "./book";
 import { useUserStore } from "./user";
 
@@ -256,28 +255,37 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
         // Revert asset balance changes
         const bills = get().bills;
-        const assetStore = useAssetStore.getState();
+        const meta = get().infos?.meta;
+        const currentAssets = meta?.assets || [];
+        let assetsChanged = false;
+        
+        // Clone assets to avoid direct mutation before updateGlobalMeta
+        const newAssets = [...currentAssets];
 
         ids.forEach((id) => {
             const bill = bills.find((b) => b.id === id);
             if (bill && bill.assetId) {
-                const asset = assetStore.assets.find(
-                    (a) => a.id === bill.assetId,
-                );
-                if (asset) {
+                const assetIndex = newAssets.findIndex((a) => a.id === bill.assetId);
+                if (assetIndex >= 0) {
+                    const asset = { ...newAssets[assetIndex] };
                     const amount = amountToNumber(bill.amount);
                     if (bill.type === "expense") {
-                        assetStore.updateAsset(asset.id, {
-                            balance: asset.balance + amount,
-                        });
+                        asset.balance += amount;
                     } else if (bill.type === "income") {
-                        assetStore.updateAsset(asset.id, {
-                            balance: asset.balance - amount,
-                        });
+                        asset.balance -= amount;
                     }
+                    newAssets[assetIndex] = asset;
+                    assetsChanged = true;
                 }
             }
         });
+
+        if (assetsChanged) {
+            await get().updateGlobalMeta((prev) => ({
+                ...prev,
+                assets: newAssets,
+            }));
+        }
 
         const repo = getCurrentFullRepoName();
         await StorageAPI.batch(
@@ -293,48 +301,56 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
         // Handle asset balance updates
         const bills = get().bills;
-        const assetStore = useAssetStore.getState();
+        const meta = get().infos?.meta;
+        const currentAssets = meta?.assets || [];
+        let assetsChanged = false;
+        
+        // Clone assets to avoid direct mutation before updateGlobalMeta
+        const newAssets = [...currentAssets];
 
         entries.forEach(({ id, entry: newBill }) => {
             const oldBill = bills.find((b) => b.id === id);
             if (oldBill) {
                 // Revert old bill effect if asset involved
                 if (oldBill.assetId) {
-                    const oldAsset = assetStore.assets.find(
-                        (a) => a.id === oldBill.assetId,
-                    );
-                    if (oldAsset) {
+                    const oldAssetIndex = newAssets.findIndex((a) => a.id === oldBill.assetId);
+                    if (oldAssetIndex >= 0) {
+                        const oldAsset = { ...newAssets[oldAssetIndex] };
                         const oldAmount = amountToNumber(oldBill.amount);
                         if (oldBill.type === "expense") {
-                            assetStore.updateAsset(oldAsset.id, {
-                                balance: oldAsset.balance + oldAmount,
-                            });
+                            oldAsset.balance += oldAmount;
                         } else if (oldBill.type === "income") {
-                            assetStore.updateAsset(oldAsset.id, {
-                                balance: oldAsset.balance - oldAmount,
-                            });
+                            oldAsset.balance -= oldAmount;
                         }
+                        newAssets[oldAssetIndex] = oldAsset;
+                        assetsChanged = true;
                     }
                 }
 
                 if (newBill.assetId) {
                     // Use getter to get latest State
-                    const currentAsset = assetStore.getAsset(newBill.assetId);
-                    if (currentAsset) {
+                    const currentAssetIndex = newAssets.findIndex((a) => a.id === newBill.assetId);
+                    if (currentAssetIndex >= 0) {
+                        const currentAsset = { ...newAssets[currentAssetIndex] };
                         const newAmount = amountToNumber(newBill.amount);
                         if (newBill.type === "expense") {
-                            assetStore.updateAsset(currentAsset.id, {
-                                balance: currentAsset.balance - newAmount,
-                            });
+                            currentAsset.balance -= newAmount;
                         } else if (newBill.type === "income") {
-                            assetStore.updateAsset(currentAsset.id, {
-                                balance: currentAsset.balance + newAmount,
-                            });
+                            currentAsset.balance += newAmount;
                         }
+                        newAssets[currentAssetIndex] = currentAsset;
+                        assetsChanged = true;
                     }
                 }
             }
         });
+
+        if (assetsChanged) {
+            await get().updateGlobalMeta((prev) => ({
+                ...prev,
+                assets: newAssets,
+            }));
+        }
 
         const repo = getCurrentFullRepoName();
         const creatorId = useUserStore.getState().id;
@@ -358,24 +374,36 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         const { StorageAPI } = await loadStorageAPI();
 
         // Apply asset balance changes
-        const assetStore = useAssetStore.getState();
+        const meta = get().infos?.meta;
+        const currentAssets = meta?.assets || [];
+        let assetsChanged = false;
+        
+        // Clone assets to avoid direct mutation before updateGlobalMeta
+        const newAssets = [...currentAssets];
+
         entries.forEach((entry) => {
             if (entry.assetId) {
-                const asset = assetStore.getAsset(entry.assetId);
-                if (asset) {
+                const assetIndex = newAssets.findIndex((a) => a.id === entry.assetId);
+                if (assetIndex >= 0) {
+                    const asset = { ...newAssets[assetIndex] };
                     const amount = amountToNumber(entry.amount);
                     if (entry.type === "expense") {
-                        assetStore.updateAsset(entry.assetId, {
-                            balance: asset.balance - amount,
-                        });
+                        asset.balance -= amount;
                     } else if (entry.type === "income") {
-                        assetStore.updateAsset(entry.assetId, {
-                            balance: asset.balance + amount,
-                        });
+                        asset.balance += amount;
                     }
+                    newAssets[assetIndex] = asset;
+                    assetsChanged = true;
                 }
             }
         });
+
+        if (assetsChanged) {
+            await get().updateGlobalMeta((prev) => ({
+                ...prev,
+                assets: newAssets,
+            }));
+        }
 
         const repo = getCurrentFullRepoName();
         const creatorId = useUserStore.getState().id;

@@ -33,6 +33,27 @@ export type GeoLocation = {
     accuracy: number;
 };
 
+export type AssetType =
+    | "cash"
+    | "debit"
+    | "credit"
+    | "virtual"
+    | "investment"
+    | "debt";
+
+export type Asset = {
+    id: string;
+    name: string;
+    type: AssetType;
+    balance: number;
+    currency: string;
+    note?: string;
+    icon?: string;
+    color?: string;
+    createdAt: number;
+    updatedAt: number;
+};
+
 export type Bill = {
     /** 每笔账单的唯一标识 */
     id: string;
@@ -118,6 +139,8 @@ export type GlobalMeta = {
     categories?: BillCategory[];
     // 自定义Tag，所有tag都应该放在这里
     tags: BillTag[];
+    // 资产
+    assets?: Asset[];
     // 本位货币
     baseCurrency?: string;
     customCurrencies?: CustomCurrency[];

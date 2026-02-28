@@ -1,63 +1,61 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { useLedgerStore } from "./ledger";
+import type { Asset, AssetType } from "@/ledger/type";
 
-export type AssetType =
-    | "cash"
-    | "debit"
-    | "credit"
-    | "virtual"
-    | "investment"
-    | "debt";
+export type { Asset, AssetType };
 
-export interface Asset {
-    id: string;
-    name: string;
-    type: AssetType;
-    balance: number;
-    currency: string;
-    note?: string;
-    icon?: string;
-    color?: string;
-    createdAt: number;
-    updatedAt: number;
-}
+export const useAssetStore = () => {
+    // Select assets from global meta
+    const assets = useLedgerStore((state) => state.infos?.meta?.assets || []);
 
-interface AssetState {
-    assets: Asset[];
-    addAsset: (asset: Omit<Asset, "createdAt" | "updatedAt">) => void;
-    updateAsset: (
+    const addAsset = (asset: Omit<Asset, "createdAt" | "updatedAt">) => {
+        const now = Date.now();
+        const newAsset: Asset = { ...asset, createdAt: now, updatedAt: now };
+        
+        useLedgerStore.getState().updateGlobalMeta((prev) => {
+            const currentAssets = prev.assets || [];
+            return {
+                ...prev,
+                assets: [...currentAssets, newAsset],
+            };
+        });
+    };
+
+    const updateAsset = (
         id: string,
         updates: Partial<Omit<Asset, "id" | "createdAt" | "updatedAt">>,
-    ) => void;
-    deleteAsset: (id: string) => void;
-    getAsset: (id: string) => Asset | undefined;
-}
+    ) => {
+        const now = Date.now();
+        useLedgerStore.getState().updateGlobalMeta((prev) => {
+            const currentAssets = prev.assets || [];
+            return {
+                ...prev,
+                assets: currentAssets.map((a) =>
+                    a.id === id ? { ...a, ...updates, updatedAt: now } : a,
+                ),
+            };
+        });
+    };
 
-export const useAssetStore = create<AssetState>()(
-    persist(
-        (set, get) => ({
-            assets: [],
-            addAsset: (asset) => {
-                const now = Date.now();
-                const newAsset = { ...asset, createdAt: now, updatedAt: now };
-                set((state) => ({ assets: [...state.assets, newAsset] }));
-            },
-            updateAsset: (id, updates) => {
-                const now = Date.now();
-                set((state) => ({
-                    assets: state.assets.map((a) =>
-                        a.id === id ? { ...a, ...updates, updatedAt: now } : a,
-                    ),
-                }));
-            },
-            deleteAsset: (id) =>
-                set((state) => ({
-                    assets: state.assets.filter((a) => a.id !== id),
-                })),
-            getAsset: (id) => get().assets.find((a) => a.id === id),
-        }),
-        {
-            name: "asset-storage",
-        },
-    ),
-);
+    const deleteAsset = (id: string) => {
+        useLedgerStore.getState().updateGlobalMeta((prev) => {
+            const currentAssets = prev.assets || [];
+            return {
+                ...prev,
+                assets: currentAssets.filter((a) => a.id !== id),
+            };
+        });
+    };
+
+    const getAsset = (id: string) => {
+        return assets.find((a) => a.id === id);
+    };
+
+    return {
+        assets,
+        addAsset,
+        updateAsset,
+        deleteAsset,
+        getAsset,
+    };
+};
+
