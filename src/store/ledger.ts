@@ -7,8 +7,10 @@ import { loadStorageAPI } from "@/api/storage/dynamic";
 import { showBookGuide } from "@/components/book/util";
 import modal from "@/components/modal";
 import type { Action, Full, OutputType, Update } from "@/database/stash";
+import { amountToNumber } from "@/ledger/bill";
 import type { Bill, GlobalMeta, PersonalMeta } from "@/ledger/type";
 import { t } from "@/locale";
+import { useAssetStore } from "./asset";
 import { useBookStore } from "./book";
 import { useUserStore } from "./user";
 
@@ -244,6 +246,30 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
     const removeBills: LedgerStoreActions["removeBills"] = async (ids) => {
         const { StorageAPI } = await loadStorageAPI();
+        
+        // Revert asset balance changes
+        const bills = get().bills;
+        const assetStore = useAssetStore.getState();
+        
+        ids.forEach((id) => {
+            const bill = bills.find((b) => b.id === id);
+            if (bill?.assetId) {
+                const asset = assetStore.assets.find((a) => a.id === bill.assetId);
+                if (asset) {
+                    const amount = amountToNumber(bill.amount);
+                    if (bill.type === "expense") {
+                        assetStore.updateAsset(asset.id, {
+                            balance: asset.balance + amount,
+                        });
+                    } else if (bill.type === "income") {
+                        assetStore.updateAsset(asset.id, {
+                            balance: asset.balance - amount,
+                        });
+                    }
+                }
+            }
+        });
+
         const repo = getCurrentFullRepoName();
         const collection = `${useUserStore.getState().id}`;
         await StorageAPI.batch(
@@ -256,6 +282,64 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
     };
     const updateBills: LedgerStoreActions["updateBills"] = async (entries) => {
         const { StorageAPI } = await loadStorageAPI();
+        
+        // Handle asset balance updates
+        const bills = get().bills;
+        const assetStore = useAssetStore.getState();
+
+        entries.forEach(({ id, entry: newBill }) => {
+            const oldBill = bills.find((b) => b.id === id);
+            if (oldBill) {
+                // Revert old bill effect if asset involved
+                if (oldBill.assetId) {
+                    const oldAsset = assetStore.assets.find((a) => a.id === oldBill.assetId);
+                    if (oldAsset) {
+                        const oldAmount = amountToNumber(oldBill.amount);
+                        if (oldBill.type === "expense") {
+                            assetStore.updateAsset(oldAsset.id, {
+                                balance: oldAsset.balance + oldAmount,
+                            });
+                        } else if (oldBill.type === "income") {
+                            assetStore.updateAsset(oldAsset.id, {
+                                balance: oldAsset.balance - oldAmount,
+                            });
+                        }
+                    }
+                }
+                
+                // Apply new bill effect
+                // Note: newBill is partial (Omit<Bill, "id" | "creatorId">) but used as full update here?
+                // The type is `Omit<Bill, "id" | "creatorId">`. So it has amount, type, assetId.
+                // We need to fetch fresh asset state because simple + / - might have race condition if same asset used.
+                // But for now sequential updates via Zustand store actions.
+                // However, if we just updated the same asset in Revert block, we need the *new* balance.
+                // updateAsset updates the store immediately but asynchronously? Zustand `set` is sync by default usually.
+                
+                // Re-fetch asset after revert
+                // If assetId changed or same
+                const targetAssetId = newBill.assetId ?? oldBill.assetId; 
+                // Wait, if newBill doesn't have assetId, it might mean it's removed? 
+                // Actually `updateBill` usually sends the full object or partial?
+                // `entry: Omit<Bill, "id" | "creatorId">` implies full object minus ID.
+                
+                if (newBill.assetId) {
+                    const currentAsset = assetStore.getAsset(newBill.assetId); // Use getter to get latest State
+                    if (currentAsset) {
+                        const newAmount = amountToNumber(newBill.amount);
+                        if (newBill.type === "expense") {
+                            assetStore.updateAsset(currentAsset.id, {
+                                balance: currentAsset.balance - newAmount,
+                            });
+                        } else if (newBill.type === "income") {
+                            assetStore.updateAsset(currentAsset.id, {
+                                balance: currentAsset.balance + newAmount,
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
         const repo = getCurrentFullRepoName();
         const collection = `${useUserStore.getState().id}`;
         const creatorId = useUserStore.getState().id;
@@ -277,6 +361,27 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
     const addBills: LedgerStoreActions["addBills"] = async (entries) => {
         const { StorageAPI } = await loadStorageAPI();
+        
+        // Apply asset balance changes
+        const assetStore = useAssetStore.getState();
+        entries.forEach((entry) => {
+            if (entry.assetId) {
+                const asset = assetStore.getAsset(entry.assetId);
+                if (asset) {
+                    const amount = amountToNumber(entry.amount);
+                    if (entry.type === "expense") {
+                        assetStore.updateAsset(entry.assetId, {
+                            balance: asset.balance - amount,
+                        });
+                    } else if (entry.type === "income") {
+                        assetStore.updateAsset(entry.assetId, {
+                            balance: asset.balance + amount,
+                        });
+                    }
+                }
+            }
+        });
+
         const repo = getCurrentFullRepoName();
         const creatorId = useUserStore.getState().id;
         StorageAPI.batch(

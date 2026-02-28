@@ -54,6 +54,8 @@ export type Bill = {
     location?: GeoLocation;
     /** 账单的tag，可以为多个*/
     tagIds?: string[];
+    /** 关联的资产账户ID */
+    assetId?: string;
     /** 多币种 */
     currency?: {
         // 记账当时设置的本位币

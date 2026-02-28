@@ -10,6 +10,7 @@ import { ExpenseBillCategories, IncomeBillCategories } from "@/ledger/category";
 import type { Bill } from "@/ledger/type";
 import { categoriesGridClassName } from "@/ledger/utils";
 import { useIntl, useLocale } from "@/locale";
+import { useAssetStore } from "@/store/asset";
 import type { EditBill } from "@/store/ledger";
 import { usePreferenceStore } from "@/store/preference";
 import { cn } from "@/utils";
@@ -61,6 +62,8 @@ export default function EditorForm({
         useCurrency();
 
     const { incomes, expenses, categories: allCategories } = useCategory();
+
+    const { assets } = useAssetStore();
 
     const isCreate = edit === undefined;
 
@@ -402,6 +405,34 @@ export default function EditorForm({
                 </div>
                 {/* tags */}
                 <div className="w-full h-[40px] flex-shrink-0 flex-grow-0 flex gap-1 py-1 items-center overflow-x-auto px-2 text-sm font-medium scrollbar-hidden">
+                    {assets.length > 0 && (
+                        <Select
+                            value={billState.assetId}
+                            onValueChange={(v) => {
+                                setBillState((prev) => ({
+                                    ...prev,
+                                    assetId: v === "none_reset_value" ? undefined : v,
+                                }));
+                            }}
+                        >
+                            <SelectTrigger className="w-auto min-w-[80px] h-8 px-2 flex gap-1 items-center rounded-lg border text-sm whitespace-nowrap bg-transparent">
+                                <i className="icon-[mdi--bank-outline]"></i>
+                                <SelectValue placeholder={t("account") || "Account"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none_reset_value">
+                                    <span className="text-gray-400">{t("none") || "None"}</span>
+                                </SelectItem>
+                                {assets.map((a) => (
+                                    <SelectItem key={a.id} value={a.id}>
+                                        <div className="flex items-center gap-2">
+                                            <span>{a.name}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
                     <TagGroupSelector
                         isCreate={isCreate}
                         selectedTags={billState.tagIds}
