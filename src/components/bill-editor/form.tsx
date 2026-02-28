@@ -418,7 +418,12 @@ export default function EditorForm({
                                 }));
                             }}
                         >
-                            <SelectTrigger className="w-auto min-w-[80px] h-8 px-2 flex gap-1 items-center rounded-lg border text-sm whitespace-nowrap bg-transparent">
+                            <SelectTrigger
+                                className={cn(
+                                    "w-auto min-w-[80px] h-8 px-2 flex gap-1 items-center rounded-lg border",
+                                    "text-sm whitespace-nowrap bg-transparent",
+                                )}
+                            >
                                 <i className="icon-[mdi--bank-outline]" />
                                 <SelectValue
                                     placeholder={t("account") || "Account"}

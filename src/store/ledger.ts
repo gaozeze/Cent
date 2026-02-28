@@ -318,7 +318,8 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
                 }
 
                 if (newBill.assetId) {
-                    const currentAsset = assetStore.getAsset(newBill.assetId); // Use getter to get latest State
+                    // Use getter to get latest State
+                    const currentAsset = assetStore.getAsset(newBill.assetId);
                     if (currentAsset) {
                         const newAmount = amountToNumber(newBill.amount);
                         if (newBill.type === "expense") {

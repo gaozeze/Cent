@@ -69,7 +69,11 @@ export default function AssetList() {
                         <button
                             key={asset.id}
                             type="button"
-                            className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
+                            className={cn(
+                                "flex justify-between items-center p-3 border rounded-lg",
+                                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                                "transition-colors cursor-pointer w-full text-left",
+                            )}
                             onClick={() => handleEdit(asset)}
                         >
                             <div className="flex flex-col">
