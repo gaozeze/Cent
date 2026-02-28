@@ -258,7 +258,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         const meta = get().infos?.meta;
         const currentAssets = meta?.assets || [];
         let assetsChanged = false;
-        
+
         // Clone assets to avoid direct mutation before updateGlobalMeta
         const newAssets = [...currentAssets];
 
@@ -306,7 +306,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         const meta = get().infos?.meta;
         const currentAssets = meta?.assets || [];
         let assetsChanged = false;
-        
+
         // Clone assets to avoid direct mutation before updateGlobalMeta
         const newAssets = [...currentAssets];
 

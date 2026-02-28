@@ -10,7 +10,7 @@ export const useAssetStore = () => {
     const addAsset = (asset: Omit<Asset, "createdAt" | "updatedAt">) => {
         const now = Date.now();
         const newAsset: Asset = { ...asset, createdAt: now, updatedAt: now };
-        
+
         useLedgerStore.getState().updateGlobalMeta((prev) => {
             const currentAssets = prev.assets || [];
             return {
