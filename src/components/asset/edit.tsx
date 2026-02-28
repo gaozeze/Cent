@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useId, useState } from "react";
 import { toast } from "sonner";
+import IOSUnscrolledInput from "@/components/input";
 import { Button } from "@/components/ui/button";
-import { useCurrency } from "@/hooks/use-currency";
-import { useIntl } from "@/locale";
-import { type Asset, type AssetType, useAssetStore } from "@/store/asset";
-import { cn } from "@/utils";
-import IOSUnscrolledInput from "../input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
+import { useCurrency } from "@/hooks/use-currency";
+import { useIntl } from "@/locale";
+import { type Asset, type AssetType, useAssetStore } from "@/store/asset";
 
 const assetTypes: { label: string; value: AssetType; icon: string }[] = [
     { label: "Cash", value: "cash", icon: "mdi--cash" },
@@ -30,12 +29,15 @@ interface AssetEditProps {
 
 export default function AssetEdit({ asset, onClose }: AssetEditProps) {
     const t = useIntl();
+    const id = useId();
     const { addAsset, updateAsset } = useAssetStore();
     const { allCurrencies, baseCurrency } = useCurrency();
     const [name, setName] = useState(asset?.name || "");
     const [type, setType] = useState<AssetType>(asset?.type || "cash");
     const [balance, setBalance] = useState(asset?.balance?.toString() || "0");
-    const [currency, setCurrency] = useState(asset?.currency || baseCurrency.id);
+    const [currency, setCurrency] = useState(
+        asset?.currency || baseCurrency.id,
+    );
     const [note, setNote] = useState(asset?.note || "");
 
     const handleSubmit = () => {
@@ -43,7 +45,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             toast.error("Name is required");
             return;
         }
-        
+
         const numBalance = parseFloat(balance);
         if (isNaN(numBalance)) {
             toast.error("Invalid balance");
@@ -80,9 +82,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </h2>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor="asset-name">Name</label>
+                <label className="text-sm font-medium" htmlFor={`${id}-name`}>
+                    Name
+                </label>
                 <IOSUnscrolledInput
-                    id="asset-name"
+                    id={`${id}-name`}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter asset name"
@@ -91,9 +95,14 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor="asset-type">Type</label>
-                <Select value={type} onValueChange={(v) => setType(v as AssetType)}>
-                    <SelectTrigger className="w-full" id="asset-type">
+                <label className="text-sm font-medium" htmlFor={`${id}-type`}>
+                    Type
+                </label>
+                <Select
+                    value={type}
+                    onValueChange={(v) => setType(v as AssetType)}
+                >
+                    <SelectTrigger className="w-full" id={`${id}-type`}>
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -110,9 +119,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor="asset-balance">Balance</label>
+                <label className="text-sm font-medium" htmlFor={`${id}-balance`}>
+                    Balance
+                </label>
                 <IOSUnscrolledInput
-                    id="asset-balance"
+                    id={`${id}-balance`}
                     type="number"
                     value={balance}
                     onChange={(e) => setBalance(e.target.value)}
@@ -122,9 +133,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor="asset-currency">Currency</label>
+                <label className="text-sm font-medium" htmlFor={`${id}-currency`}>
+                    Currency
+                </label>
                 <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="w-full" id="asset-currency">
+                    <SelectTrigger className="w-full" id={`${id}-currency`}>
                         <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -138,9 +151,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor="asset-note">Note</label>
+                <label className="text-sm font-medium" htmlFor={`${id}-note`}>
+                    Note
+                </label>
                 <IOSUnscrolledInput
-                    id="asset-note"
+                    id={`${id}-note`}
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Optional note"
@@ -152,7 +167,10 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                 <Button variant="ghost" onClick={onClose} className="flex-1">
                     Cancel
                 </Button>
-                <Button onClick={handleSubmit} className="flex-1 bg-primary text-primary-foreground">
+                <Button
+                    onClick={handleSubmit}
+                    className="flex-1 bg-primary text-primary-foreground"
+                >
                     Save
                 </Button>
             </div>

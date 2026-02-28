@@ -411,17 +411,24 @@ export default function EditorForm({
                             onValueChange={(v) => {
                                 setBillState((prev) => ({
                                     ...prev,
-                                    assetId: v === "none_reset_value" ? undefined : v,
+                                    assetId:
+                                        v === "none_reset_value"
+                                            ? undefined
+                                            : v,
                                 }));
                             }}
                         >
                             <SelectTrigger className="w-auto min-w-[80px] h-8 px-2 flex gap-1 items-center rounded-lg border text-sm whitespace-nowrap bg-transparent">
-                                <i className="icon-[mdi--bank-outline]"></i>
-                                <SelectValue placeholder={t("account") || "Account"} />
+                                <i className="icon-[mdi--bank-outline]" />
+                                <SelectValue
+                                    placeholder={t("account") || "Account"}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none_reset_value">
-                                    <span className="text-gray-400">{t("none") || "None"}</span>
+                                    <span className="text-gray-400">
+                                        {t("none") || "None"}
+                                    </span>
                                 </SelectItem>
                                 {assets.map((a) => (
                                     <SelectItem key={a.id} value={a.id}>

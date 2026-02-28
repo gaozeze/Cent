@@ -66,20 +66,16 @@ export default function AssetList() {
                     </div>
                 ) : (
                     assets.map((asset) => (
-                        <div
-                            role="button"
-                            tabIndex={0}
+                        <button
                             key={asset.id}
-                            className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                            type="button"
+                            className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
                             onClick={() => handleEdit(asset)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                    handleEdit(asset);
-                                }
-                            }}
                         >
                             <div className="flex flex-col">
-                                <span className="font-medium">{asset.name}</span>
+                                <span className="font-medium">
+                                    {asset.name}
+                                </span>
                                 <span className="text-xs text-gray-400 capitalize">
                                     {asset.type}
                                 </span>
@@ -99,7 +95,7 @@ export default function AssetList() {
                                     {asset.currency}
                                 </span>
                             </div>
-                        </div>
+                        </button>
                     ))
                 )}
             </div>
