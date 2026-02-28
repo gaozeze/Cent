@@ -31,14 +31,31 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
     );
     const [note, setNote] = useState(asset?.note || "");
 
-    const assetTypes = useMemo<{ label: string; value: AssetType; icon: string }[]>(() => [
-        { label: t("cash"), value: "cash", icon: "mdi--cash" },
-        { label: t("debit"), value: "debit", icon: "mdi--credit-card-outline" },
-        { label: t("credit"), value: "credit", icon: "mdi--credit-card" },
-        { label: t("virtual"), value: "virtual", icon: "mdi--wallet-outline" },
-        { label: t("investment"), value: "investment", icon: "mdi--finance" },
-        { label: t("debt"), value: "debt", icon: "mdi--hand-coin-outline" },
-    ], [t]);
+    const assetTypes = useMemo<
+        { label: string; value: AssetType; icon: string }[]
+    >(
+        () => [
+            { label: t("cash"), value: "cash", icon: "mdi--cash" },
+            {
+                label: t("debit"),
+                value: "debit",
+                icon: "mdi--credit-card-outline",
+            },
+            { label: t("credit"), value: "credit", icon: "mdi--credit-card" },
+            {
+                label: t("virtual"),
+                value: "virtual",
+                icon: "mdi--wallet-outline",
+            },
+            {
+                label: t("investment"),
+                value: "investment",
+                icon: "mdi--finance",
+            },
+            { label: t("debt"), value: "debt", icon: "mdi--hand-coin-outline" },
+        ],
+        [t],
+    );
 
     const handleSubmit = () => {
         if (!name) {

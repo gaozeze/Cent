@@ -265,7 +265,9 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         ids.forEach((id) => {
             const bill = bills.find((b) => b.id === id);
             if (bill && bill.assetId) {
-                const assetIndex = newAssets.findIndex((a) => a.id === bill.assetId);
+                const assetIndex = newAssets.findIndex(
+                    (a) => a.id === bill.assetId,
+                );
                 if (assetIndex >= 0) {
                     const asset = { ...newAssets[assetIndex] };
                     const amount = amountToNumber(bill.amount);
@@ -313,7 +315,9 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
             if (oldBill) {
                 // Revert old bill effect if asset involved
                 if (oldBill.assetId) {
-                    const oldAssetIndex = newAssets.findIndex((a) => a.id === oldBill.assetId);
+                    const oldAssetIndex = newAssets.findIndex(
+                        (a) => a.id === oldBill.assetId,
+                    );
                     if (oldAssetIndex >= 0) {
                         const oldAsset = { ...newAssets[oldAssetIndex] };
                         const oldAmount = amountToNumber(oldBill.amount);
@@ -329,9 +333,13 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
                 if (newBill.assetId) {
                     // Use getter to get latest State
-                    const currentAssetIndex = newAssets.findIndex((a) => a.id === newBill.assetId);
+                    const currentAssetIndex = newAssets.findIndex(
+                        (a) => a.id === newBill.assetId,
+                    );
                     if (currentAssetIndex >= 0) {
-                        const currentAsset = { ...newAssets[currentAssetIndex] };
+                        const currentAsset = {
+                            ...newAssets[currentAssetIndex],
+                        };
                         const newAmount = amountToNumber(newBill.amount);
                         if (newBill.type === "expense") {
                             currentAsset.balance -= newAmount;
@@ -377,13 +385,15 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         const meta = get().infos?.meta;
         const currentAssets = meta?.assets || [];
         let assetsChanged = false;
-        
+
         // Clone assets to avoid direct mutation before updateGlobalMeta
         const newAssets = [...currentAssets];
 
         entries.forEach((entry) => {
             if (entry.assetId) {
-                const assetIndex = newAssets.findIndex((a) => a.id === entry.assetId);
+                const assetIndex = newAssets.findIndex(
+                    (a) => a.id === entry.assetId,
+                );
                 if (assetIndex >= 0) {
                     const asset = { ...newAssets[assetIndex] };
                     const amount = amountToNumber(entry.amount);
