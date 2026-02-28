@@ -82,10 +82,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </h2>
 
             <div className="flex flex-col gap-2">
-                <label
-                    className="text-sm font-medium"
-                    htmlFor={`${id}-name`}
-                >
+                <label className="text-sm font-medium" htmlFor={`${id}-name`}>
                     Name
                 </label>
                 <IOSUnscrolledInput
@@ -98,20 +95,14 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label
-                    className="text-sm font-medium"
-                    htmlFor={`${id}-type`}
-                >
+                <label className="text-sm font-medium" htmlFor={`${id}-type`}>
                     Type
                 </label>
                 <Select
                     value={type}
                     onValueChange={(v) => setType(v as AssetType)}
                 >
-                    <SelectTrigger
-                        className="w-full"
-                        id={`${id}-type`}
-                    >
+                    <SelectTrigger className="w-full" id={`${id}-type`}>
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -128,10 +119,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label
-                    className="text-sm font-medium"
-                    htmlFor={`${id}-balance`}
-                >
+                <label className="text-sm font-medium" htmlFor={`${id}-balance`}>
                     Balance
                 </label>
                 <IOSUnscrolledInput
@@ -145,17 +133,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label
-                    className="text-sm font-medium"
-                    htmlFor={`${id}-currency`}
-                >
+                <label className="text-sm font-medium" htmlFor={`${id}-currency`}>
                     Currency
                 </label>
                 <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger
-                        className="w-full"
-                        id={`${id}-currency`}
-                    >
+                    <SelectTrigger className="w-full" id={`${id}-currency`}>
                         <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -169,10 +151,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label
-                    className="text-sm font-medium"
-                    htmlFor={`${id}-note`}
-                >
+                <label className="text-sm font-medium" htmlFor={`${id}-note`}>
                     Note
                 </label>
                 <IOSUnscrolledInput
