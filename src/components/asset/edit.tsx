@@ -1,4 +1,3 @@
-import { ActionSheet } from "radix-ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
@@ -129,7 +128,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                     <SelectContent>
                         {allCurrencies.map((c) => (
                             <SelectItem key={c.id} value={c.id}>
-                                {c.name} ({c.code})
+                                {c.id} ({c.symbol})
                             </SelectItem>
                         ))}
                     </SelectContent>

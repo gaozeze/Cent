@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { singleton } from '@/database/singleton';
 
 export type AssetType = 'cash' | 'debit' | 'credit' | 'virtual' | 'investment' | 'debt';
 
@@ -46,7 +45,6 @@ export const useAssetStore = create<AssetState>()(
     }),
     {
       name: 'asset-storage',
-      storage: singleton('assets'),
     }
   )
 );
