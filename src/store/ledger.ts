@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { merge } from "lodash-es";
 import { v4 } from "uuid";
 import { create } from "zustand";
+
 import type { UserInfo } from "@/api/endpoints/type";
 import { loadStorageAPI } from "@/api/storage/dynamic";
 import { showBookGuide } from "@/components/book/util";
@@ -10,6 +11,7 @@ import type { Action, Full, OutputType, Update } from "@/database/stash";
 import { amountToNumber } from "@/ledger/bill";
 import type { Bill, GlobalMeta, PersonalMeta } from "@/ledger/type";
 import { t } from "@/locale";
+
 import { useAssetStore } from "./asset";
 import { useBookStore } from "./book";
 import { useUserStore } from "./user";
@@ -127,7 +129,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
                     }),
                 );
             })
-            .catch((err) => []);
+            .catch(() => []);
         return bills;
     };
 
@@ -150,7 +152,12 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
             await updateBillList(MIN_SIZE);
             StorageAPI.toSync();
         } catch (err) {
-            if ((err as any)?.status === 404) {
+            if (
+                typeof err === "object" &&
+                err !== null &&
+                "status" in err &&
+                (err as { status: number }).status === 404
+            ) {
                 const { toast } = await toastLib;
                 toast.error(
                     t(
@@ -253,7 +260,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
         ids.forEach((id) => {
             const bill = bills.find((b) => b.id === id);
-            if (bill?.assetId) {
+            if (bill && bill.assetId) {
                 const asset = assetStore.assets.find(
                     (a) => a.id === bill.assetId,
                 );
@@ -273,7 +280,6 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         });
 
         const repo = getCurrentFullRepoName();
-        const collection = `${useUserStore.getState().id}`;
         await StorageAPI.batch(
             repo,
             ids.map((id) => ({
@@ -311,21 +317,6 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
                     }
                 }
 
-                // Apply new bill effect
-                // Note: newBill is partial (Omit<Bill, "id" | "creatorId">) but used as full update here?
-                // The type is `Omit<Bill, "id" | "creatorId">`. So it has amount, type, assetId.
-                // We need to fetch fresh asset state because simple + / - might have race condition if same asset used.
-                // But for now sequential updates via Zustand store actions.
-                // However, if we just updated the same asset in Revert block, we need the *new* balance.
-                // updateAsset updates the store immediately but asynchronously? Zustand `set` is sync by default usually.
-
-                // Re-fetch asset after revert
-                // If assetId changed or same
-                const targetAssetId = newBill.assetId ?? oldBill.assetId;
-                // Wait, if newBill doesn't have assetId, it might mean it's removed?
-                // Actually `updateBill` usually sends the full object or partial?
-                // `entry: Omit<Bill, "id" | "creatorId">` implies full object minus ID.
-
                 if (newBill.assetId) {
                     const currentAsset = assetStore.getAsset(newBill.assetId); // Use getter to get latest State
                     if (currentAsset) {
@@ -345,7 +336,6 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
         });
 
         const repo = getCurrentFullRepoName();
-        const collection = `${useUserStore.getState().id}`;
         const creatorId = useUserStore.getState().id;
         await StorageAPI.batch(
             repo,
@@ -388,7 +378,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
         const repo = getCurrentFullRepoName();
         const creatorId = useUserStore.getState().id;
-        StorageAPI.batch(
+        await StorageAPI.batch(
             repo,
             entries.map((v) => {
                 return {
@@ -505,21 +495,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
                     value: { ...v, creatorId, id: v4() },
                 } as Update<Bill>;
             });
-            StorageAPI.batch(repo, actions);
-            // if (overlap) {
-            // 	const current = get().bills.filter((v) => v.creatorId === creatorId);
-            // 	actions.push(
-            // 		...current.map(
-            // 			(v) =>
-            // 				({
-            // 					type: "remove",
-            // 					store: repo,
-            // 					params: v.id,
-            // 					collection: `${creatorId}`,
-            // 				}) as BaseItemAction<Bill>,
-            // 		),
-            // 	);
-            // }
+            await StorageAPI.batch(repo, actions);
         },
     };
 });
