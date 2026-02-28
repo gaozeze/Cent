@@ -1,37 +1,46 @@
 import { useState } from "react";
-import { useAssetStore, type Asset } from "@/store/asset";
+
 import { Button } from "@/components/ui/button";
 import { useIntl } from "@/locale";
-import AssetEdit from "./edit";
+import { type Asset, useAssetStore } from "@/store/asset";
 import { cn } from "@/utils";
+import AssetEdit from "./edit";
 
 export default function AssetList() {
     const t = useIntl();
     const { assets, deleteAsset } = useAssetStore();
-    const [editingAsset, setEditingAsset] = useState<Asset | undefined | null>(null); // null means list view, undefined means adding new asset? No, let's use:
+    const [editingAsset, setEditingAsset] = useState<Asset | undefined | null>(
+        null,
+    );
+    // null means list view, undefined means adding new asset? No, let's use:
     // viewState: 'list' | 'edit' | 'add'
-    const [viewState, setViewState] = useState<'list' | 'edit' | 'add'>('list');
-    const [selectedAsset, setSelectedAsset] = useState<Asset | undefined>(undefined);
-
+    const [viewState, setViewState] = useState<"list" | "edit" | "add">("list");
+    const [selectedAsset, setSelectedAsset] = useState<Asset | undefined>(
+        undefined,
+    );
     const handleEdit = (asset: Asset) => {
         setSelectedAsset(asset);
-        setViewState('edit');
+        setViewState("edit");
     };
 
     const handleAdd = () => {
         setSelectedAsset(undefined);
-        setViewState('add');
+        setViewState("add");
     };
 
     const handleBack = () => {
-        setViewState('list');
+        setViewState("list");
         setSelectedAsset(undefined);
     };
 
-    if (viewState === 'edit' || viewState === 'add') {
+    if (viewState === "edit" || viewState === "add") {
         return (
             <div className="h-full flex flex-col">
-                <Button variant="ghost" onClick={handleBack} className="self-start mb-2">
+                <Button
+                    variant="ghost"
+                    onClick={handleBack}
+                    className="self-start mb-2"
+                >
                     <i className="icon-[mdi--arrow-left] mr-1" />
                     Back
                 </Button>
@@ -58,19 +67,37 @@ export default function AssetList() {
                 ) : (
                     assets.map((asset) => (
                         <div
+                            role="button"
+                            tabIndex={0}
                             key={asset.id}
                             className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                             onClick={() => handleEdit(asset)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    handleEdit(asset);
+                                }
+                            }}
                         >
                             <div className="flex flex-col">
                                 <span className="font-medium">{asset.name}</span>
-                                <span className="text-xs text-gray-400 capitalize">{asset.type}</span>
+                                <span className="text-xs text-gray-400 capitalize">
+                                    {asset.type}
+                                </span>
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className={cn("font-bold", asset.balance < 0 ? "text-red-500" : "text-green-500")}>
+                                <span
+                                    className={cn(
+                                        "font-bold",
+                                        asset.balance < 0
+                                            ? "text-red-500"
+                                            : "text-green-500",
+                                    )}
+                                >
                                     {asset.balance.toFixed(2)}
                                 </span>
-                                <span className="text-xs text-gray-400">{asset.currency}</span>
+                                <span className="text-xs text-gray-400">
+                                    {asset.currency}
+                                </span>
                             </div>
                         </div>
                     ))

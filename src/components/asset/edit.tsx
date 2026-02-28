@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { useCurrency } from "@/hooks/use-currency";
-import { useAssetStore, type Asset, type AssetType } from "@/store/asset";
+import { useIntl } from "@/locale";
+import { type Asset, type AssetType, useAssetStore } from "@/store/asset";
 import { cn } from "@/utils";
 import IOSUnscrolledInput from "../input";
-import { Button } from "@/components/ui/button"; // Use absolute path to ensure correct import
 import {
     Select,
     SelectContent,
@@ -12,7 +13,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
-import { useIntl } from "@/locale";
 
 const assetTypes: { label: string; value: AssetType; icon: string }[] = [
     { label: "Cash", value: "cash", icon: "mdi--cash" },
@@ -80,8 +80,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </h2>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-medium" htmlFor="asset-name">Name</label>
                 <IOSUnscrolledInput
+                    id="asset-name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter asset name"
@@ -90,9 +91,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Type</label>
+                <label className="text-sm font-medium" htmlFor="asset-type">Type</label>
                 <Select value={type} onValueChange={(v) => setType(v as AssetType)}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full" id="asset-type">
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -109,8 +110,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Balance</label>
+                <label className="text-sm font-medium" htmlFor="asset-balance">Balance</label>
                 <IOSUnscrolledInput
+                    id="asset-balance"
                     type="number"
                     value={balance}
                     onChange={(e) => setBalance(e.target.value)}
@@ -120,9 +122,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Currency</label>
+                <label className="text-sm font-medium" htmlFor="asset-currency">Currency</label>
                 <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full" id="asset-currency">
                         <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -136,8 +138,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Note</label>
+                <label className="text-sm font-medium" htmlFor="asset-note">Note</label>
                 <IOSUnscrolledInput
+                    id="asset-note"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Optional note"
