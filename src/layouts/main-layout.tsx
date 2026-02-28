@@ -9,6 +9,7 @@ import { BudgetEditProvider, BudgetProvider } from "@/components/budget";
 import { BudgetDetailProvider } from "@/components/budget/detail";
 import { CategoryListProvider } from "@/components/category";
 import { CurrencyListProvider } from "@/components/currency";
+import { AssetListProvider } from "@/components/asset";
 import { ModalProvider } from "@/components/modal";
 import Navigation from "@/components/navigation";
 import {
@@ -68,6 +69,7 @@ export default function MainLayout() {
                 <SortableGroupProvider />
                 <Settings />
                 <CurrencyListProvider />
+                <AssetListProvider />
                 <BookGuide />
                 <BookConfirmProvider />
                 <BudgetProvider />

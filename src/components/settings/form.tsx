@@ -2,6 +2,7 @@ import { StorageAPI, StorageDeferredAPI } from "@/api/storage";
 import PopupLayout from "@/layouts/popup-layout";
 import { useIntl } from "@/locale";
 import { useUserStore } from "@/store/user";
+import AssetSettingsItem from "../asset";
 import TagSettingsItem from "../bill-tag";
 import { BookSettings } from "../book";
 import Budget from "../budget";
@@ -132,6 +133,7 @@ export default function SettingsForm({
                         <div className="flex flex-col divide-y">
                             <CategorySettingsItem />
                             <TagSettingsItem />
+                            <AssetSettingsItem />
                             <Budget />
                             <ScheduledSettingsItems />
                             <CurrencySettingsItem />
