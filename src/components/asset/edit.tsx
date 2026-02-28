@@ -119,7 +119,10 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium" htmlFor={`${id}-balance`}>
+                <label
+                    className="text-sm font-medium"
+                    htmlFor={`${id}-balance`}
+                >
                     Balance
                 </label>
                 <IOSUnscrolledInput
@@ -131,6 +134,9 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                     className="border p-2 rounded-md"
                 />
             </div>
+                    className="text-sm font-medium"
+                    htmlFor={`${id}-currency`}
+                
 
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium" htmlFor={`${id}-currency`}>
