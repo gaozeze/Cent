@@ -42,7 +42,7 @@ export default function AssetList() {
                     className="self-start mb-2"
                 >
                     <i className="icon-[mdi--arrow-left] mr-1" />
-                    Back
+                    {t("back")}
                 </Button>
                 <AssetEdit asset={selectedAsset} onClose={handleBack} />
             </div>
@@ -52,17 +52,17 @@ export default function AssetList() {
     return (
         <div className="flex flex-col h-full p-4 gap-4">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Assets</h2>
+                <h2 className="text-xl font-bold">{t("assets")}</h2>
                 <Button onClick={handleAdd} size="sm">
                     <i className="icon-[mdi--plus] mr-1" />
-                    Add Asset
+                    {t("add-asset")}
                 </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                 {assets.length === 0 ? (
                     <div className="text-center text-gray-500 py-8">
-                        No assets found. Add one to get started.
+                        {t("no-assets")}
                     </div>
                 ) : (
                     assets.map((asset) => (
@@ -81,7 +81,7 @@ export default function AssetList() {
                                     {asset.name}
                                 </span>
                                 <span className="text-xs text-gray-400 capitalize">
-                                    {asset.type}
+                                    {t(asset.type)}
                                 </span>
                             </div>
                             <div className="flex flex-col items-end">

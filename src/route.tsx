@@ -18,11 +18,21 @@ const Stat = lazyWithReload(
 
 const Search = lazyWithReload(() => import("@/pages/search"));
 
+const Assets = lazyWithReload(() => import("@/pages/assets"));
+
 function RootRoute() {
     return (
         <Routes>
             <Route element={<MainLayout />}>
                 <Route index element={<Home />} />
+                <Route
+                    path="/assets"
+                    element={
+                        <Suspense fallback={<LoadingSkeleton />}>
+                            <Assets />
+                        </Suspense>
+                    }
+                />
                 <Route
                     path="/search"
                     element={

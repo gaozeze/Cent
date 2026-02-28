@@ -11,10 +11,12 @@ export default function Navigation() {
     const navigate = useNavigate();
 
     const currentTab = useMemo(() => {
-        return ["/stat", "/", "/search"].find((x) => location.pathname === x);
+        return ["/stat", "/", "/search", "/assets"].find(
+            (x) => location.pathname === x,
+        );
     }, [location.pathname]);
 
-    const switchTab = (value: "/" | "/stat" | "/search") => {
+    const switchTab = (value: "/" | "/stat" | "/search" | "/assets") => {
         navigate(`${value}`);
     };
 
@@ -35,7 +37,20 @@ export default function Navigation() {
                 }`}
                 onClick={() => switchTab("/search")}
             >
-                <i className="icon-[mdi--search] size-5"></i>
+                <i className="icon-[mdi--search] size-5" />
+            </button>
+
+            {/* assets */}
+            <button
+                type="button"
+                className={`w-14 h-14 sm:w-10 sm:h-10 cursor-pointer flex items-center justify-center rounded-full shadow-md m-2 transition-all hover:bg-[#9a9ba2] active:bg-[#cdcdd0] dark:hover:bg-[#aba8a5] ${
+                    currentTab === "/assets"
+                        ? "bg-[#cdcdd0] dark:bg-[#918c89]"
+                        : "bg-background dark:bg-stone-500"
+                }`}
+                onClick={() => switchTab("/assets")}
+            >
+                <i className="icon-[mdi--wallet-outline] size-5" />
             </button>
 
             {/* middle group */}

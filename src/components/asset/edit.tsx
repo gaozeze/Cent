@@ -78,25 +78,25 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
     return (
         <div className="flex flex-col gap-4 p-4">
             <h2 className="text-lg font-semibold mb-2">
-                {asset ? "Edit Asset" : "Add Asset"}
+                {asset ? t("edit-asset") : t("add-asset")}
             </h2>
 
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium" htmlFor={`${id}-name`}>
-                    Name
+                    {t("name")}
                 </label>
                 <IOSUnscrolledInput
                     id={`${id}-name`}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter asset name"
+                    placeholder={t("name")}
                     className="border p-2 rounded-md"
                 />
             </div>
 
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium" htmlFor={`${id}-type`}>
-                    Type
+                    {t("type")}
                 </label>
                 <Select
                     value={type}
@@ -106,11 +106,11 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                        {assetTypes.map((t) => (
-                            <SelectItem key={t.value} value={t.value}>
+                        {assetTypes.map((tItem) => (
+                            <SelectItem key={tItem.value} value={tItem.value}>
                                 <div className="flex items-center gap-2">
-                                    <i className={`icon-[${t.icon}]`} />
-                                    {t.label}
+                                    <i className={`icon-[${tItem.icon}]`} />
+                                    {t(tItem.value)}
                                 </div>
                             </SelectItem>
                         ))}
@@ -123,14 +123,14 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                     className="text-sm font-medium"
                     htmlFor={`${id}-balance`}
                 >
-                    Balance
+                    {t("balance")}
                 </label>
                 <IOSUnscrolledInput
                     id={`${id}-balance`}
                     type="number"
                     value={balance}
                     onChange={(e) => setBalance(e.target.value)}
-                    placeholder="Initial balance"
+                    placeholder={t("initial-balance")}
                     className="border p-2 rounded-md"
                 />
             </div>
@@ -140,7 +140,7 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                     className="text-sm font-medium"
                     htmlFor={`${id}-currency`}
                 >
-                    Currency
+                    {t("currency")}
                 </label>
                 <Select value={currency} onValueChange={setCurrency}>
                     <SelectTrigger className="w-full" id={`${id}-currency`}>
@@ -158,26 +158,26 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
 
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium" htmlFor={`${id}-note`}>
-                    Note
+                    {t("comment")}
                 </label>
                 <IOSUnscrolledInput
                     id={`${id}-note`}
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="Optional note"
+                    placeholder={t("optional-note")}
                     className="border p-2 rounded-md"
                 />
             </div>
 
             <div className="flex gap-2 mt-4">
                 <Button variant="ghost" onClick={onClose} className="flex-1">
-                    Cancel
+                    {t("cancel")}
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     className="flex-1 bg-primary text-primary-foreground"
                 >
-                    Save
+                    {t("save")}
                 </Button>
             </div>
         </div>
