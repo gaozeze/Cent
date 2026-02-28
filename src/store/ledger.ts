@@ -355,7 +355,7 @@ export const useLedgerStore = create<LedgerStore>()((set, get) => {
 
     const addBills: LedgerStoreActions["addBills"] = async (entries) => {
         const { StorageAPI } = await loadStorageAPI();
-        
+
         // Apply asset balance changes
         const assetStore = useAssetStore.getState();
         entries.forEach((entry) => {
