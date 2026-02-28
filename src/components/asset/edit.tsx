@@ -133,6 +133,8 @@ export default function AssetEdit({ asset, onClose }: AssetEditProps) {
                     placeholder="Initial balance"
                     className="border p-2 rounded-md"
                 />
+            </div>
+
             <div className="flex flex-col gap-2">
                 <label
                     className="text-sm font-medium"
